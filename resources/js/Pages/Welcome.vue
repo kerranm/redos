@@ -79,7 +79,7 @@ function storeTask(task) {
 async function copyToClipboard() {
     if (window.isSecureContext && navigator.clipboard) {
         await navigator.clipboard.writeText(
-            "https://abbio.com/share/".list.value.id
+            "https://abbio.com/share/" + list.value.id
         );
         alert("Copied");
     }
