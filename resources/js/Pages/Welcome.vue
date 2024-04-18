@@ -13,14 +13,6 @@ defineProps({
     canRegister: {
         type: Boolean,
     },
-    laravelVersion: {
-        type: String,
-        required: true,
-    },
-    phpVersion: {
-        type: String,
-        required: true,
-    },
 });
 
 onMounted(() => {
@@ -39,10 +31,8 @@ async function refreshList() {
 async function initializeTaskList() {
     const taskListId = localStorage.getItem("taskListId");
     if (taskListId) {
-        console.log("existing");
         fetchTaskList(taskListId);
     } else {
-        console.log("new");
         await createTaskList();
     }
 }
@@ -131,7 +121,11 @@ function handleImageError() {
         </div>
 
         <div class="">
-            <TaskInput :list-id="list.id" @task-added="storeTask" />
+            <TaskInput
+                :list-id="list.id"
+                @task-added="storeTask"
+                v-if="list && list.id"
+            />
 
             <div class="grid grid-cols-1 space-y-2">
                 <TaskItem
