@@ -13,10 +13,6 @@ const props = defineProps({
     canRegister: {
         type: Boolean,
     },
-    laravelVersion: {
-        type: String,
-        required: true,
-    },
     list: {
         type: Object,
     },
