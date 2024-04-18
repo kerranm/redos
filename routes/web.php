@@ -14,13 +14,20 @@ Route::get('/', function () {
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
     ]);
 });
 
 Route::get('/list/{list}', function (TaskList $list) {
     return response()->json($list->load('tasks'));
 })->name('lists.show');
+
+Route::get('/share/{list}', function (TaskList $list) {
+    return Inertia::render('SharedList', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'list' => $list->load('tasks'),
+    ]);
+})->name('lists.share');
 
 
 Route::post('lists', function(Request $request) {

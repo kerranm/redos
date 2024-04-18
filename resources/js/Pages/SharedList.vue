@@ -2,11 +2,11 @@
 import TaskItem from "@/Components/TaskItem.vue";
 import TaskInput from "@/Components/TaskInput.vue";
 import { Head, Link } from "@inertiajs/vue3";
-import { ResetIcon, Share1Icon } from "@radix-icons/vue";
+import { ResetIcon } from "@radix-icons/vue";
 import { Button } from "@/shadcn/components/ui/button";
 
-import { onMounted, reactive, ref } from "vue";
-defineProps({
+import { onMounted, reactive, ref, watchEffect } from "vue";
+const props = defineProps({
     canLogin: {
         type: Boolean,
     },
@@ -17,79 +17,36 @@ defineProps({
         type: String,
         required: true,
     },
-    phpVersion: {
-        type: String,
-        required: true,
+    list: {
+        type: Object,
     },
 });
 
+const tasks = reactive([]);
+
 onMounted(() => {
-    initializeTaskList();
+    if (props.list && props.list.tasks.length > 0) {
+        props.list.tasks.forEach((task) => {
+            tasks.push(task);
+        });
+    }
 });
 
-const tasksList = reactive([]);
-const list = ref({});
-
-async function refreshList() {
-    clearList();
-    localStorage.removeItem("taskListId");
-    await createTaskList();
-}
-
-async function initializeTaskList() {
-    const taskListId = localStorage.getItem("taskListId");
-    if (taskListId) {
-        console.log("existing");
-        fetchTaskList(taskListId);
-    } else {
-        console.log("new");
-        await createTaskList();
-    }
-}
-
-function clearList() {
-    tasksList.splice(0, tasksList.length);
-}
-
 async function fetchTaskList(id) {
-    clearList();
+    tasks.splice(0, tasks.length);
     try {
         const response = await axios.get("/list/" + id);
-        list.value = response.data;
 
-        if (list.value.tasks) {
-            tasksList.push(...list.value.tasks);
+        if (response.data.tasks) {
+            tasks.push(...response.data.tasks);
         }
     } catch (error) {
         console.log("creating a new one");
-        await createTaskList();
     }
-}
-
-async function createTaskList() {
-    const response = await axios.post("/lists");
-    list.value = response.data;
-    localStorage.setItem("taskListId", response.data.id);
 }
 
 function storeTask(task) {
-    tasksList.push(task);
-}
-
-async function copyToClipboard() {
-    if (window.isSecureContext && navigator.clipboard) {
-        await navigator.clipboard.writeText(
-            "https://abbio.com/share/".list.value.id
-        );
-        alert("Copied");
-    }
-}
-
-function handleImageError() {
-    document.getElementById("screenshot-container")?.classList.add("!hidden");
-    document.getElementById("docs-card")?.classList.add("!row-span-1");
-    document.getElementById("docs-card-content")?.classList.add("!flex-row");
-    document.getElementById("background")?.classList.add("!hidden");
+    tasks.push(task);
 }
 </script>
 
@@ -123,28 +80,21 @@ function handleImageError() {
             </template>
         </nav>
 
-        <div>
-            Reference: {{ list.id }}
-            <Button variant="link" size="sm" @click.prevent="copyToClipboard">
-                <Share1Icon />
-            </Button>
-        </div>
+        <div>Reference: {{ list.id }}</div>
 
         <div class="">
             <TaskInput :list-id="list.id" @task-added="storeTask" />
 
-            <div class="grid grid-cols-1 space-y-2">
+            <div
+                class="grid grid-cols-1 space-y-2"
+                v-if="tasks && tasks.length > 0"
+            >
                 <TaskItem
-                    v-for="task in tasksList"
+                    v-for="task in tasks"
                     :key="task.id"
                     :task="task"
                     @task-updated="fetchTaskList(list.id)"
                 />
-            </div>
-            <div class="flex justify-around p-2">
-                <Button variant="outline" @click.prevent="refreshList">
-                    <ResetIcon />
-                </Button>
             </div>
         </div>
     </div>
