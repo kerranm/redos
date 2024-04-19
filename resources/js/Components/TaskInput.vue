@@ -33,6 +33,10 @@ async function addTask() {
         });
 
         task.value = "";
+        // focus back in the input
+        const input = document.getElementById("task");
+        input.focus();
+
         emit("task-added", response.data);
     } catch (error) {
         console.log(error);

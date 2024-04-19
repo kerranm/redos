@@ -2,23 +2,11 @@
 import TaskItem from "@/Components/TaskItem.vue";
 import TaskInput from "@/Components/TaskInput.vue";
 import { Head, Link } from "@inertiajs/vue3";
-import { ResetIcon, Share1Icon } from "@radix-icons/vue";
-
-import {
-    Book,
-    Bot,
-    Code2,
-    LifeBuoy,
-    Settings2,
-    Share,
-    SquareTerminal,
-    SquareUser,
-    Triangle,
-} from "lucide-vue-next";
-
 import { Button } from "@/shadcn/components/ui/button";
-
+import Layout from "@/Components/Layout.vue";
+import { RefreshCcw, Share } from "lucide-vue-next";
 import { onMounted, reactive, ref } from "vue";
+
 defineProps({
     canLogin: {
         type: Boolean,
@@ -99,115 +87,40 @@ function handleImageError() {
 <template>
     <Head title="Welcome" />
 
-    <div class="grid h-screen w-full pl-[53px]">
-        <aside class="fixed left-0 z-20 flex flex-col h-full border-r inset-y">
-            <div class="p-2 border-b">
-                <Button variant="outline" size="icon" aria-label="Home">
-                    <Triangle class="size-5 fill-foreground" />
-                </Button>
-            </div>
-            <nav class="grid gap-1 p-2">
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    class="rounded-lg bg-muted"
-                    aria-label="Playground"
-                >
-                    <SquareTerminal class="size-5" />
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    class="rounded-lg"
-                    aria-label="Models"
-                >
-                    <Bot class="size-5" />
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    class="rounded-lg"
-                    aria-label="API"
-                >
-                    <Code2 class="size-5" />
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    class="rounded-lg"
-                    aria-label="Documentation"
-                >
-                    <Book class="size-5" />
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    class="rounded-lg"
-                    aria-label="Settings"
-                >
-                    <Settings2 class="size-5" />
-                </Button>
-            </nav>
-            <nav class="grid gap-1 p-2 mt-auto">
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    class="mt-auto rounded-lg"
-                    aria-label="Help"
-                >
-                    <LifeBuoy class="size-5" />
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    class="mt-auto rounded-lg"
-                    aria-label="Account"
-                >
-                    <SquareUser class="size-5" />
-                </Button>
-            </nav>
-        </aside>
-        <div class="flex flex-col">
-            <header
-                class="sticky top-0 z-10 flex h-[53px] items-center gap-1 border-b bg-background px-4"
+    <Layout can-login="canLogin" can-register="canRegister">
+        <template v-slot:header>
+            <h1 class="text-xl font-semibold">Reference: {{ list.id }}</h1>
+            <Button
+                variant="outline"
+                size="sm"
+                class="ml-auto gap-1.5 text-sm"
+                @click.prevent="copyToClipboard"
             >
-                <h1 class="text-xl font-semibold">Reference: {{ list.id }}</h1>
+                <Share class="size-3.5" />
+                Share
+            </Button>
+        </template>
 
-                <Button
-                    variant="outline"
-                    size="sm"
-                    class="ml-auto gap-1.5 text-sm"
-                    @click.prevent="copyToClipboard"
-                >
-                    <Share class="size-3.5" />
-                    Share
-                </Button>
-            </header>
-            <main class="grid flex-1 gap-4 p-4 overflow-auto lg:grid-cols-1">
-                <div class="relative flex-col gap-1 md:flex">
-                    <TaskInput
-                        :list-id="list.id"
-                        @task-added="storeTask"
-                        v-if="list && list.id"
-                    />
+        <TaskInput
+            :list-id="list.id"
+            @task-added="storeTask"
+            v-if="list && list.id"
+        />
 
-                    <div class="space-y-2">
-                        <TaskItem
-                            v-for="task in tasksList"
-                            :key="task.id"
-                            :task="task"
-                            @task-updated="fetchTaskList(list.id)"
-                        />
-                    </div>
-                    <div class="flex justify-around p-2">
-                        <Button variant="outline" @click.prevent="refreshList">
-                            <ResetIcon />
-                        </Button>
-                    </div>
-                </div>
-            </main>
+        <div class="space-y-2">
+            <TaskItem
+                v-for="task in tasksList"
+                :key="task.id"
+                :task="task"
+                @task-updated="fetchTaskList(list.id)"
+            />
         </div>
-    </div>
+        <div class="flex justify-around p-2">
+            <Button variant="outline" @click.prevent="refreshList">
+                <RefreshCcw size="14" class="text-gray-900" />
+            </Button>
+        </div>
+    </Layout>
 
     <div class="container mx-auto">
         <nav v-if="canLogin" class="flex justify-end flex-1 -mx-3">

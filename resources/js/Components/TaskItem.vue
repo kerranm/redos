@@ -13,6 +13,9 @@
                 <span :class="{ 'line-through': task.completed_at }">{{
                     task.description
                 }}</span>
+                <span class="block text-xs">
+                    {{ task.completed_at }}
+                </span>
             </p>
         </div>
     </div>

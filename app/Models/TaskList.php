@@ -26,6 +26,7 @@ class TaskList extends Model
 
     protected $fillable = [
         'name',
+        'user_id'
     ];
     
     public function tasks() 

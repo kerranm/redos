@@ -32,6 +32,7 @@ Route::get('/share/{list}', function (TaskList $list) {
 
 Route::post('lists', function(Request $request) {
     $list = TaskList::create([
+        "user_id" => auth()->id() ? auth()->id() : null,
         "name" => date("Y-m-d H:i:s"),
     ]);
     return $list;
@@ -43,8 +44,8 @@ Route::post('lists/{list}/task/{task}', function(Request $request, TaskList $lis
 });
 
 Route::post('lists/{list}/task', function(Request $request, TaskList $list) {
-    
     $task = $list->tasks()->create([
+         "user_id" => auth()->id() ? auth()->id() : null,
         "description" => $request->task,
     ]);
 
