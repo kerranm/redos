@@ -1,0 +1,1 @@
+import{o as t,f as s,r}from"./app-Mrv2_nhE.js";const o={class:"flex flex-col items-center min-h-screen pt-6 bg-gray-100 sm:justify-center sm:pt-0"},l={__name:"GuestLayout",setup(c){return(e,n)=>(t(),s("div",o,[r(e.$slots,"default")]))}};export{l as _};

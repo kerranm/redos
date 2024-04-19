@@ -1,41 +1,37 @@
 <script setup>
-import TaskItem from "@/Components/TaskItem.vue";
-import TaskInput from "@/Components/TaskInput.vue";
-import { Head, Link } from "@inertiajs/vue3";
-import { Button } from "@/shadcn/components/ui/button";
 import Layout from "@/Components/Layout.vue";
+import TaskInput from "@/Components/TaskInput.vue";
+import TaskItem from "@/Components/TaskItem.vue";
+import { Button } from "@/shadcn/components/ui/button";
+import { Head } from "@inertiajs/vue3";
 import { RefreshCcw, Share } from "lucide-vue-next";
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive } from "vue";
 
-defineProps({
+const props = defineProps({
     canLogin: {
         type: Boolean,
     },
     canRegister: {
         type: Boolean,
     },
-});
-
-onMounted(() => {
-    initializeTaskList();
+    list: {
+        type: Object,
+        required: true,
+    },
 });
 
 const tasksList = reactive([]);
-const list = ref({});
+
+onMounted(() => {
+    props.list.tasks.forEach((task) => {
+        tasksList.push(task);
+    });
+});
 
 async function refreshList() {
     clearList();
     localStorage.removeItem("taskListId");
     await createTaskList();
-}
-
-async function initializeTaskList() {
-    const taskListId = localStorage.getItem("taskListId");
-    if (taskListId) {
-        fetchTaskList(taskListId);
-    } else {
-        await createTaskList();
-    }
 }
 
 function clearList() {
@@ -46,14 +42,12 @@ async function fetchTaskList(id) {
     clearList();
     try {
         const response = await axios.get("/list/" + id);
-        list.value = response.data;
 
-        if (list.value.tasks) {
-            tasksList.push(...list.value.tasks);
-        }
+        response.data.tasks.forEach((task) => {
+            tasksList.push(task);
+        });
     } catch (error) {
         console.log("creating a new one");
-        await createTaskList();
     }
 }
 
@@ -74,13 +68,6 @@ async function copyToClipboard() {
         );
         alert("Copied");
     }
-}
-
-function handleImageError() {
-    document.getElementById("screenshot-container")?.classList.add("!hidden");
-    document.getElementById("docs-card")?.classList.add("!row-span-1");
-    document.getElementById("docs-card-content")?.classList.add("!flex-row");
-    document.getElementById("background")?.classList.add("!hidden");
 }
 </script>
 

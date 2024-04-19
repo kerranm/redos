@@ -15,7 +15,7 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
     ]);
-});
+})->name('welcome');
 
 Route::get('/list/{list}', function (TaskList $list) {
     return response()->json($list->load('tasks'));
@@ -29,6 +29,27 @@ Route::get('/share/{list}', function (TaskList $list) {
     ]);
 })->name('lists.share');
 
+
+Route::get('lists', function(Request $request){
+    
+    if(!auth()->id()) {
+        return redirect()->back();
+    }
+
+    return Inertia::render('Lists/Index', [
+        'lists' => auth()->user()->lists->load('tasks'),
+    ]);
+
+})->name('lists.index');
+
+Route::get('/lists/{list}', function (TaskList $list) {
+
+    return Inertia::render('Lists/Show', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'list' => $list->load('tasks'),
+    ]);
+})->name('lists.show');
 
 Route::post('lists', function(Request $request) {
     $list = TaskList::create([
